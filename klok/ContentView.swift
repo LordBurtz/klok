@@ -16,23 +16,21 @@ struct ContentView: View {
     
     private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
-    private var hour: CGFloat {
-        CGFloat(Calendar.current.component(.hour, from: currentTime))
+    private var hour: Int {
+        Calendar.current.component(.hour, from: currentTime)
     }
 
-    private var minute: CGFloat {
-        CGFloat(Calendar.current.component(.minute, from: currentTime))
+    private var minute: Int {
+        Calendar.current.component(.minute, from: currentTime)
     }
 
-    private var second: CGFloat {
-        CGFloat(Calendar.current.component(.second, from: currentTime))
-    }
-    
-    private var hour12: CGFloat {
-        hour.truncatingRemainder(dividingBy: 12) == 0 ? 12 : hour.truncatingRemainder(dividingBy: 12)
+    private var second: Int {
+        Calendar.current.component(.second, from: currentTime)
     }
     
     let styling: Styling = (accent: Color.whiteDD, width: 2)
+    let backgroundColor: Color = Color.black11
+    let padding: CGFloat = 70
     
     var body: some View {
         VStack {
@@ -43,48 +41,54 @@ struct ContentView: View {
                     Spacer()
                         .frame(height: geo.size.height * 0.15)
                     
-                    Vertiklok(style: styling, value: Int(hour12), percentage: (hour12 + 1) / 13) {
-                        Horiklok(style: styling, value: Int(minute), percentage: (minute + 1) / 61) {
-                            Vertiklok(style: styling, value: Int(second), percentage: (second + 1) / 61) {
-                                
-                            }
-                        }
-                    }
-                    .frame(width: len, height: len)
-                    .border(styling.accent, width: styling.width)
+                    BlockKlock(hour: CGFloat(hour), minute: CGFloat(minute), second: CGFloat(second), styling: styling)
+                        .frame(width: len, height: len)
                     
                     Spacer()
                         .frame(height: 30)
                     
-                    HStack(alignment: .center, spacing: 10) {
-                        FancyNumber(num: Int(hour))
-                        FancyNumber(num: Int(minute))
-                        FancyNumber(num: Int(second))
-                    }
+                    SteinKlock(hour: hour, minute: minute, second: second)
                     
                     Spacer()
                 }
                 .frame(maxHeight: .infinity)
             }
         }
-        .padding(70)
+        .padding(padding)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color.black11)
+        .background(backgroundColor)
         .onReceive(timer) { input in
             currentTime = input
         }
-        .sensoryFeedback(
-            .impact(weight: .light),
-            trigger: second)
-        .sensoryFeedback(
-            .impact(weight: .medium),
-            trigger: minute)
-        .sensoryFeedback(
-            .impact(weight: .heavy),
-            trigger: hour)
+        .withSecondFeedback(trigger: second)
+        .withMinuteFeedback(trigger: minute)
+        .withHourFeedback(trigger: hour)
         .withShakeEasterEgg(showShakeAlert: $showShakeAlert) {
             showShakeAlert = true
         }
+    }
+}
+
+extension View {
+    func withSecondFeedback<T : Equatable>(trigger: T) -> some View where T : Equatable {
+        self
+            .sensoryFeedback(
+                .impact(weight: .light),
+                trigger: trigger)
+    }
+    
+    func withMinuteFeedback<T : Equatable>(trigger: T) -> some View where T : Equatable {
+        self
+            .sensoryFeedback(
+                .impact(weight: .medium),
+                trigger: trigger)
+    }
+    
+    func withHourFeedback<T : Equatable>(trigger: T) -> some View where T : Equatable {
+        self
+            .sensoryFeedback(
+                .impact(weight: .heavy),
+                trigger: trigger)
     }
 }
 

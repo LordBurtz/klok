@@ -7,9 +7,32 @@
 
 import SwiftUI
 
+typealias Styling = (accent: Color, width: CGFloat)
+
+struct BlockKlock: View {
+    let hour: CGFloat
+    let minute: CGFloat
+    let second: CGFloat
+    let styling: Styling
+    
+    private var hour12: CGFloat {
+        hour.truncatingRemainder(dividingBy: 12) == 0 ? 12 : hour.truncatingRemainder(dividingBy: 12)
+    }
+    
+    var body: some View {
+        Vertiklok(style: styling, percentage: (hour12 + 1) / 13) {
+            Horiklok(style: styling, percentage: (minute + 1) / 61) {
+                Vertiklok(style: styling, percentage: (second + 1) / 61) {
+                    
+                }
+            }
+        }
+        .border(styling.accent, width: styling.width)
+    }
+}
+
 struct Vertiklok<V: View>: View {
     let style: Styling
-    let value: Int
     let percentage: CGFloat
     
     @ViewBuilder var content: () -> V
@@ -36,7 +59,6 @@ struct Vertiklok<V: View>: View {
 
 struct Horiklok<V: View>: View {
     let style: Styling
-    let value: Int
     let percentage: CGFloat
     
     @ViewBuilder var content: () -> V
@@ -61,6 +83,41 @@ struct Horiklok<V: View>: View {
     }
 }
 
+struct KlotzKlokWrapper: View {
+    @State private var currentTime = Date()
+    
+    private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+
+    private var hour: Int {
+        Calendar.current.component(.hour, from: currentTime)
+    }
+
+    private var minute: Int {
+        Calendar.current.component(.minute, from: currentTime)
+    }
+
+    private var second: Int {
+        Calendar.current.component(.second, from: currentTime)
+    }
+    
+    let styling: Styling = (accent: Color.white, width: 2)
+    
+    var body: some View {
+        BlockKlock(
+            hour: CGFloat(3), minute: CGFloat(40), second: CGFloat(30), styling: (Color.black, 2))
+        .background(Color.black)
+        .onReceive(timer) { input in
+            currentTime = input
+        }
+        .id(currentTime)
+    }
+}
+
 #Preview {
-    ContentView()
+    VStack {
+        KlotzKlokWrapper()
+            .frame(width: 300, height: 300)
+    }
+    .frame(maxWidth: .infinity, maxHeight: .infinity)
+    .background(Color.black)
 }

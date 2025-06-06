@@ -7,6 +7,20 @@
 
 import SwiftUI
 
+struct SteinKlock: View {
+    let hour: Int
+    let minute: Int
+    let second: Int
+    
+    var body: some View {
+        HStack(alignment: .center, spacing: 10) {
+            FancyNumber(num: hour)
+            FancyNumber(num: minute)
+            FancyNumber(num: second)
+        }
+    }
+}
+
 struct FancyNumber: View {
     let num: Int
     
@@ -46,26 +60,21 @@ extension CVarArg {
     var digits: [Int] { String(format: "%02d", self).compactMap({$0.wholeNumberValue}) }
 }
 
-private struct FancyNumberWrapper: View {
+private struct SteinsKlokWrapper: View {
     @State private var currentTime = Date()
-    private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+    private let timer = Timer.publish(every: 3, on: .main, in: .common).autoconnect()
     
     var body: some View {
-        HStack(alignment: .center, spacing: 10) {
-            FancyNumber(num: 7)
-            FancyNumber(num: 12)
-            FancyNumber(num: 12)
-        }
+        SteinKlock(hour: Int.random(in: 1..<25), minute: Int.random(in: 1..<61), second: Int.random(in: 1..<61))
         .frame(maxWidth: .infinity, maxHeight: .infinity,)
         .background(Color.black)
         .onReceive(timer) { input in
             currentTime = input
-            
         }
         .id(currentTime)
     }
 }
 
 #Preview {
-    FancyNumberWrapper()
+    SteinsKlokWrapper()
 }
