@@ -11,16 +11,16 @@ typealias Styling = (accent: Color, width: CGFloat)
 
 struct ContentView: View {
     
-    @State private var currentTime = Date(timeIntervalSince1970: TimeInterval(1749207618)) //Date()
-//    @State private var currentTime = Date()
+    @State private var currentTime = Date()
+    
     private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
     private var hour: CGFloat {
-        CGFloat(Calendar.current.component(.second, from: currentTime))
+        CGFloat(Calendar.current.component(.hour, from: currentTime))
     }
 
     private var minute: CGFloat {
-        CGFloat(Calendar.current.component(.second, from: currentTime))
+        CGFloat(Calendar.current.component(.minute, from: currentTime))
     }
 
     private var second: CGFloat {
@@ -42,9 +42,9 @@ struct ContentView: View {
                     Spacer()
                         .frame(height: geo.size.height * 0.15)
                     
-                    Vertiklok(style: styling, value: Int(hour12), percentage: hour12 / 12) {
-                        Horiklok(style: styling, value: Int(minute), percentage: minute / 60) {
-                            Vertiklok(style: styling, value: Int(second), percentage: second / 60) {
+                    Vertiklok(style: styling, value: Int(hour12), percentage: (hour12 + 1) / 13) {
+                        Horiklok(style: styling, value: Int(minute), percentage: (minute + 1) / 61) {
+                            Vertiklok(style: styling, value: Int(second), percentage: (second + 1) / 61) {
                                 
                             }
                         }
