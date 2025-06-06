@@ -12,6 +12,7 @@ typealias Styling = (accent: Color, width: CGFloat)
 struct ContentView: View {
     
     @State private var currentTime = Date()
+    @State private var showShakeAlert = false
     
     private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
@@ -81,6 +82,9 @@ struct ContentView: View {
         .sensoryFeedback(
             .impact(weight: .heavy),
             trigger: hour)
+        .withShakeEasterEgg(showShakeAlert: $showShakeAlert) {
+            showShakeAlert = true
+        }
     }
 }
 
